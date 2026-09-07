@@ -176,7 +176,12 @@ final class TeamWorkflowTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: output) }
 
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+        let pythonCandidates = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3"]
+        guard let pythonPath = pythonCandidates.first(where: FileManager.default.isExecutableFile(atPath:)) else {
+            XCTFail("A supported Homebrew Python 3 interpreter is required for the fulfillment contract test")
+            return
+        }
+        process.executableURL = URL(fileURLWithPath: pythonPath)
         process.arguments = [
             repository.appendingPathComponent("fulfillment/ingest_fulfillment.py").path,
             "fulfill",
