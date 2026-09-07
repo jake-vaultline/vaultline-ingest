@@ -198,6 +198,35 @@ final class TeamWorkflowTests: XCTestCase {
                        Set(["project", "shooter", "camera", "reel"]))
     }
 
+    func testWebsiteGeneratedProfileDecodesAndRejectsInvalidProfile() throws {
+        let repository = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixtureRoot = repository.appendingPathComponent("parity-fixtures", isDirectory: true)
+        let fixtureDirectory = fixtureRoot.appendingPathComponent("current", isDirectory: true)
+        let validPath = fixtureDirectory.appendingPathComponent("website-profile.json").path
+        let invalidPath = fixtureDirectory.appendingPathComponent("website-invalid-profile.json").path
+        guard FileManager.default.fileExists(atPath: validPath),
+              FileManager.default.fileExists(atPath: invalidPath)
+        else {
+            throw XCTSkip("Generate website profile fixtures with scripts/verify-website-profile-parity.sh")
+        }
+
+        let validData = try Data(contentsOf: URL(fileURLWithPath: validPath))
+        let package = try JSONDecoder().decode(TeamConfigurationPackage.self, from: validData).validated()
+        XCTAssertEqual(package.team.teamName, "Northstar")
+        XCTAssertEqual(package.naming.fileTemplate, "{date:yyMMdd}_{code}_{reel}_{seq:0000}")
+        XCTAssertEqual(package.team.workflows.first?.mediaFolder, "01_Media/Camera")
+        XCTAssertEqual(package.team.workflows.first?.folders,
+                       ["01_Media/Camera", "01_Media/Audio", "02_Edit/Premiere", "03_Exports"])
+        XCTAssertEqual(Set(package.form.fields.compactMap(\.token)),
+                       Set(["shootDate", "project", "jobNumber", "camera", "reel", "notes"]))
+
+        let invalidData = try Data(contentsOf: URL(fileURLWithPath: invalidPath))
+        XCTAssertThrowsError(try JSONDecoder().decode(TeamConfigurationPackage.self, from: invalidData).validated())
+    }
+
     func testDateAndTeamTokensRenderWithoutRetypingDate() throws {
         let values = WorkflowTemplate.Values(fields: ["jobNumber": "184", "project": "Launch Film"], date: fixedDate)
         let output = try WorkflowTemplate.render("{date:yyyyMMdd}_{jobNumber}_{project}", values: values)
