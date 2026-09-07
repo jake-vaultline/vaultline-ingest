@@ -199,11 +199,14 @@ final class TeamWorkflowTests: XCTestCase {
     }
 
     func testWebsiteGeneratedProfileDecodesAndRejectsInvalidProfile() throws {
-        let environment = ProcessInfo.processInfo.environment
-        let validPath = environment["WEBSITE_PROFILE_PATH"]
-            ?? "/tmp/vlp-657-profile-parity/website-profile.json"
-        let invalidPath = environment["WEBSITE_INVALID_PROFILE_PATH"]
-            ?? "/tmp/vlp-657-profile-parity/website-invalid-profile.json"
+        let repository = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixtureRoot = repository.appendingPathComponent("parity-fixtures", isDirectory: true)
+        let fixtureDirectory = fixtureRoot.appendingPathComponent("current", isDirectory: true)
+        let validPath = fixtureDirectory.appendingPathComponent("website-profile.json").path
+        let invalidPath = fixtureDirectory.appendingPathComponent("website-invalid-profile.json").path
         guard FileManager.default.fileExists(atPath: validPath),
               FileManager.default.fileExists(atPath: invalidPath)
         else {

@@ -10,6 +10,7 @@ DerivedData/
 *.xcarchive
 *.xcresult
 *.dSYM/
+parity-fixtures/
 **/xcuserdata/
 *.xcuserstate
 
