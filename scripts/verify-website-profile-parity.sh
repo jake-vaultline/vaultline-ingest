@@ -18,15 +18,20 @@ if [[ -n "$(git -C "$website_root" status --porcelain)" ]]; then
   exit 1
 fi
 fixture_root="$(pwd)/parity-fixtures"
-fixture_dir="$fixture_root/$(uuidgen | tr '[:upper:]' '[:lower:]')"
+mkdir -p "$fixture_root"
+lock_dir="$fixture_root/.parity-lock"
+if ! mkdir "$lock_dir" 2>/dev/null; then
+  echo "another parity verification is active; refusing to share fixture state" >&2
+  exit 1
+fi
+fixture_dir="$(mktemp -d "$fixture_root/run.XXXXXXXX")"
 fixture_alias="$fixture_root/current"
+trap 'if [[ -L "$fixture_alias" ]] && [[ "$(readlink "$fixture_alias")" == "$fixture_dir" ]]; then rm "$fixture_alias"; fi; rm -rf "$fixture_dir" "$lock_dir"' EXIT
 if [[ -e "$fixture_alias" || -L "$fixture_alias" ]]; then
   echo "an existing parity fixture is present; refusing to clobber it" >&2
   exit 1
 fi
-mkdir -p "$fixture_dir"
 ln -s "$fixture_dir" "$fixture_alias"
-trap 'rm -f "$fixture_alias"; rm -rf "$fixture_dir"' EXIT
 
 valid_profile="$fixture_dir/website-profile.json"
 invalid_profile="$fixture_dir/website-invalid-profile.json"
