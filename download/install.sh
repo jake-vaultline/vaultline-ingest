@@ -12,8 +12,9 @@ set -euo pipefail
 
 VERSION="0.3.0"
 SHA256="7fb29c2cfa78920e674346cf8da8b34e5a3ed2f2e8d93185650c0d9d519a25c0"
-BASE="https://github.com/jake-vaultline/vaultline-labs/releases/download"
-DMG="ingest-v${VERSION}/VaultlineIngest-${VERSION}.dmg"
+BASE="https://github.com/jake-vaultline/vaultline-labs/releases/download/ingest-v${VERSION}"
+DMG="VaultlineIngest-${VERSION}.dmg"
+RELEASE_PAGE="https://github.com/jake-vaultline/vaultline-labs/releases/tag/ingest-v${VERSION}"
 APP="VaultlineIngest.app"
 
 bold() { printf "\033[1m%s\033[0m\n" "$1"; }
@@ -57,7 +58,7 @@ hdiutil detach "$TMP/mnt" -quiet
 # Confirm what actually landed on disk is Apple-notarized. If Gatekeeper is
 # unhappy, say so here rather than letting the user meet it as a scary dialog.
 if ! spctl -a -t exec "/Applications/$APP" >/dev/null 2>&1; then
-  echo "  ! macOS could not verify this copy. Remove it and download manually from ${BASE}."
+  echo "  ! macOS could not verify this copy. Remove it and download manually from ${RELEASE_PAGE}."
 fi
 
 bold "Installed to /Applications/${APP}"

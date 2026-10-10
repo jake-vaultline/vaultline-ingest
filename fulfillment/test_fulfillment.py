@@ -47,9 +47,10 @@ class FulfillmentTests(unittest.TestCase):
     dmg_match=re.search(r'DMG="([^"]+)"',install_sh)
     self.assertIsNotNone(base_match,"BASE not found in install.sh")
     self.assertIsNotNone(dmg_match,"DMG not found in install.sh")
-    base=base_match.group(1)
-    dmg_raw=dmg_match.group(1)
-    dmg_expanded=dmg_raw.replace("${VERSION}",version)
-    resolved_url=f"{base}/{dmg_expanded}"
+    base_raw=base_match.group(1)
+    dmg=dmg_match.group(1)
+    base_expanded=base_raw.replace("${VERSION}",version)
+    dmg_expanded=dmg.replace("${VERSION}",version)
+    resolved_url=f"{base_expanded}/{dmg_expanded}"
     self.assertEqual(resolved_url,RELEASE["dmgURL"],f"Resolved URL ({resolved_url}) does not match RELEASE dmgURL ({RELEASE['dmgURL']})")
 if __name__=="__main__": unittest.main()

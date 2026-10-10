@@ -38,7 +38,7 @@ instruct the operator to update the public installer or upload the DMG.
 
 ```bash
 VERSION="0.3.0"
-SHA256="7fb29c2cfa78920e674346cf8da8b34e5a3ed2f2e8d93185650c0d9d519a25c0"
+SHA256="<the printed hash>"
 ```
 
 The installer refuses to open a DMG that doesn't match. Skipping this means a client
