@@ -10,10 +10,10 @@
 #
 set -euo pipefail
 
-VERSION="0.2.1"
-SHA256="dc035849d9786d2caf7d9f961cd25f18f3facb58f8c3e41aa83205623e9df523"
-BASE="https://vaultline.io/ingest"
-DMG="VaultlineIngest-${VERSION}.dmg"
+VERSION="0.3.0"
+SHA256="7fb29c2cfa78920e674346cf8da8b34e5a3ed2f2e8d93185650c0d9d519a25c0"
+BASE="https://github.com/jake-vaultline/vaultline-labs/releases/download"
+DMG="ingest-v${VERSION}/VaultlineIngest-${VERSION}.dmg"
 APP="VaultlineIngest.app"
 
 bold() { printf "\033[1m%s\033[0m\n" "$1"; }

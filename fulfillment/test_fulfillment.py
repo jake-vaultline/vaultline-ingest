@@ -1,6 +1,6 @@
-import json, tempfile, unittest, uuid
+import json, re, tempfile, unittest, uuid
 from pathlib import Path
-from ingest_fulfillment import fulfill, verify, FulfillmentError
+from ingest_fulfillment import fulfill, verify, FulfillmentError, RELEASE
 
 HERE=Path(__file__).parent
 class FulfillmentTests(unittest.TestCase):
@@ -33,4 +33,23 @@ class FulfillmentTests(unittest.TestCase):
       r["resolved"]["naming"]["fileTemplate"]="{clientSecret}_{seq:0000}"
       p=Path(td)/"r.json"; p.write_text(json.dumps(r))
       with self.assertRaises(FulfillmentError): fulfill(p,Path(td)/"out")
+  def test_install_script_pin_matches_release(self):
+    install_sh=(HERE.parent/"download/install.sh").read_text()
+    version_match=re.search(r'VERSION="([^"]+)"',install_sh)
+    sha256_match=re.search(r'SHA256="([^"]+)"',install_sh)
+    self.assertIsNotNone(version_match,"VERSION not found in install.sh")
+    self.assertIsNotNone(sha256_match,"SHA256 not found in install.sh")
+    version=version_match.group(1)
+    sha256=sha256_match.group(1)
+    self.assertEqual(version,RELEASE["version"],f"VERSION in install.sh ({version}) does not match RELEASE version ({RELEASE['version']})")
+    self.assertEqual(sha256,RELEASE["sha256"],f"SHA256 in install.sh ({sha256}) does not match RELEASE sha256 ({RELEASE['sha256']})")
+    base_match=re.search(r'BASE="([^"]+)"',install_sh)
+    dmg_match=re.search(r'DMG="([^"]+)"',install_sh)
+    self.assertIsNotNone(base_match,"BASE not found in install.sh")
+    self.assertIsNotNone(dmg_match,"DMG not found in install.sh")
+    base=base_match.group(1)
+    dmg_raw=dmg_match.group(1)
+    dmg_expanded=dmg_raw.replace("${VERSION}",version)
+    resolved_url=f"{base}/{dmg_expanded}"
+    self.assertEqual(resolved_url,RELEASE["dmgURL"],f"Resolved URL ({resolved_url}) does not match RELEASE dmgURL ({RELEASE['dmgURL']})")
 if __name__=="__main__": unittest.main()
