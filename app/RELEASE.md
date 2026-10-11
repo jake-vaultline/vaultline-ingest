@@ -37,7 +37,7 @@ instruct the operator to update the public installer or upload the DMG.
 `release.sh` prints the DMG's SHA-256. Put it in `../download/install.sh`:
 
 ```bash
-VERSION="0.2.1"
+VERSION="0.3.0"
 SHA256="<the printed hash>"
 ```
 
